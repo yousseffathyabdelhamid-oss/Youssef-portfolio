@@ -31,6 +31,13 @@ window.portfolioData = portfolioData;
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
 const safeUrl = (value = '') => /^(https?:\/\/|\.\/|\.\.\/|\/)/i.test(String(value)) ? String(value) : '';
+const isImageUrl = (value = '') => {
+	try {
+		return /\.(avif|gif|jpe?g|png|webp)$/i.test(new URL(value, window.location.href).pathname);
+	} catch (error) {
+		return false;
+	}
+};
 
 const createLink = (className, href, label, ariaLabel) => {
 		const link = document.createElement('a');
@@ -66,12 +73,14 @@ const renderCertificates = () => {
 		const card = document.createElement('article');
 		card.className = 'certificate-card';
 		const preview = document.createElement('div');
-		const isImage = /\.(avif|gif|jpe?g|png|webp)(\?.*)?$/i.test(certificate.pdf || '');
+		const isImage = isImageUrl(certificate.pdf);
 		preview.className = `certificate-image${certificate.pdf && !isImage ? ' pdf-preview' : ''}${certificate.pdf ? '' : ' pdf-missing'}`;
 		if (isImage) {
+			preview.classList.add('has-image');
 			const image = document.createElement('img');
 			image.src = safeUrl(certificate.pdf);
 			image.alt = `${escapeHtml(certificate.title)} certificate preview`;
+			image.decoding = 'async';
 			preview.append(image);
 		} else if (certificate.pdf) {
 			const canvas = document.createElement('canvas');
