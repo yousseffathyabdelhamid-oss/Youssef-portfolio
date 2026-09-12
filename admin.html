@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Portfolio Admin</title>
+  <link rel="stylesheet" href="./admin.css">
+</head>
+<body>
+  <main class="admin-shell">
+    <section class="auth-panel" id="auth-panel">
+      <p class="eyebrow">Portfolio CMS</p>
+      <h1>Admin sign in</h1>
+      <p class="muted">Manage published projects and certificates securely.</p>
+      <form id="login-form" class="admin-form">
+        <label>Email<input id="email" type="email" autocomplete="username" required></label>
+        <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+        <button class="primary-button" type="submit">Sign in</button>
+        <p class="form-message" id="login-message" role="alert"></p>
+      </form>
+    </section>
+
+    <section class="dashboard" id="dashboard" hidden>
+      <header class="dashboard-header">
+        <div><p class="eyebrow">Portfolio CMS</p><h1>Content dashboard</h1></div>
+        <div class="header-actions"><a href="./index.html" target="_blank" rel="noopener">View portfolio</a><button class="secondary-button" id="logout-button" type="button">Sign out</button></div>
+      </header>
+      <div class="dashboard-message" id="dashboard-message" role="status"></div>
+      <div class="dashboard-actions"><button class="secondary-button" id="import-button" type="button">Import current portfolio data</button><span class="muted">Imports existing entries without deleting local files.</span></div>
+
+      <section class="content-section">
+        <div class="section-title"><div><p class="eyebrow">Projects</p><h2>Manage projects</h2></div><button class="primary-button" id="new-project-button" type="button">Add project</button></div>
+        <form id="project-form" class="editor-form" hidden>
+          <input id="project-id" type="hidden">
+          <label>Project name<input id="project-title" required></label>
+          <label>Description<textarea id="project-description" rows="4" required></textarea></label>
+          <label>Technologies <span class="hint">comma separated</span><input id="project-technologies"></label>
+          <label>Project Image<input id="project-image" type="file" accept="image/*"></label>
+          <div class="file-preview" id="project-image-preview" hidden></div>
+          <label>Live demo URL<input id="project-live-demo" type="url"></label>
+          <label>GitHub URL<input id="project-github" type="url"></label>
+          <label>Display order<input id="project-order" type="number" min="0" value="0"></label>
+          <label class="checkbox-label"><input id="project-published" type="checkbox" checked> Published</label>
+          <div class="form-actions"><button class="primary-button" type="submit">Save project</button><button class="secondary-button cancel-editor" data-form="project-form" type="button">Cancel</button></div>
+        </form>
+        <div class="record-list" id="projects-list"></div>
+      </section>
+
+      <section class="content-section">
+        <div class="section-title"><div><p class="eyebrow">Certificates</p><h2>Manage certificates</h2></div><button class="primary-button" id="new-certificate-button" type="button">Add certificate</button></div>
+        <form id="certificate-form" class="editor-form" hidden>
+          <input id="certificate-id" type="hidden">
+          <label>Certificate name<input id="certificate-title" required></label>
+          <label>Issuing organization<input id="certificate-organization" required></label>
+          <label>Date earned<input id="certificate-date"></label>
+          <label>Certificate Image<input id="certificate-file" type="file" accept="image/*,.pdf,application/pdf"></label>
+          <div class="file-preview" id="certificate-image-preview" hidden></div>
+          <label>Verification URL<input id="certificate-verification" type="url"></label>
+          <label>Display order<input id="certificate-order" type="number" min="0" value="0"></label>
+          <label class="checkbox-label"><input id="certificate-published" type="checkbox" checked> Published</label>
+          <div class="form-actions"><button class="primary-button" type="submit">Save certificate</button><button class="secondary-button cancel-editor" data-form="certificate-form" type="button">Cancel</button></div>
+        </form>
+        <div class="record-list" id="certificates-list"></div>
+      </section>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-config.js"></script>
+  <script src="./admin.js"></script>
+</body>
+</html>

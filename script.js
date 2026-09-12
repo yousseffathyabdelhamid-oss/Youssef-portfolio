@@ -29,10 +29,13 @@ const portfolioData = {
 
 window.portfolioData = portfolioData;
 
+const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+const safeUrl = (value = '') => /^(https?:\/\/|\.\/|\.\.\/|\/)/i.test(String(value)) ? String(value) : '';
+
 const createLink = (className, href, label, ariaLabel) => {
 		const link = document.createElement('a');
 		link.className = className;
-		link.href = href;
+		link.href = safeUrl(href) || '#';
 		link.target = '_blank';
 		link.rel = 'noopener noreferrer';
 		link.textContent = label;
@@ -45,7 +48,8 @@ const renderProjects = () => {
 	portfolioData.projects.forEach((project, index) => {
 		const card = document.createElement('article');
 		card.className = `project-card${index === 0 ? ' project-large' : ''} reveal`;
-		card.innerHTML = `<div class="project-art project-image-wrap"><img class="project-image" src="${project.image}" alt="${project.title} project preview"><span class="image-overlay" aria-hidden="true"></span></div><div class="project-info"><div><p class="project-type">${String(index + 1).padStart(2, '0')} / Educational web project</p><h3>${project.title}</h3><p class="project-description">${project.description}</p><div class="project-tech">${project.technologies.map((technology) => `<span>${technology}</span>`).join('')}</div></div></div>`;
+		const imageUrl = safeUrl(project.image);
+		card.innerHTML = `<div class="project-art project-image-wrap"><img class="project-image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(project.title)} project preview"><span class="image-overlay" aria-hidden="true"></span></div><div class="project-info"><div><p class="project-type">${String(index + 1).padStart(2, '0')} / Educational web project</p><h3>${escapeHtml(project.title)}</h3><p class="project-description">${escapeHtml(project.description)}</p><div class="project-tech">${project.technologies.map((technology) => `<span>${escapeHtml(technology)}</span>`).join('')}</div></div></div>`;
 		const projectInfo = card.querySelector('.project-info');
 		const arrow = createLink('round-arrow', project.liveDemo, '↗', `View ${project.title} live demo`);
 		projectInfo.append(arrow);
@@ -62,8 +66,14 @@ const renderCertificates = () => {
 		const card = document.createElement('article');
 		card.className = 'certificate-card';
 		const preview = document.createElement('div');
-		preview.className = `certificate-image pdf-preview${certificate.pdf ? '' : ' pdf-missing'}`;
-		if (certificate.pdf) {
+		const isImage = /\.(avif|gif|jpe?g|png|webp)(\?.*)?$/i.test(certificate.pdf || '');
+		preview.className = `certificate-image${certificate.pdf && !isImage ? ' pdf-preview' : ''}${certificate.pdf ? '' : ' pdf-missing'}`;
+		if (isImage) {
+			const image = document.createElement('img');
+			image.src = safeUrl(certificate.pdf);
+			image.alt = `${escapeHtml(certificate.title)} certificate preview`;
+			preview.append(image);
+		} else if (certificate.pdf) {
 			const canvas = document.createElement('canvas');
 			canvas.className = 'certificate-canvas';
 			canvas.dataset.pdf = certificate.pdf;
@@ -72,11 +82,11 @@ const renderCertificates = () => {
 		}
 		const status = document.createElement('span');
 		status.className = 'preview-status';
-		status.textContent = certificate.pdf ? 'Loading preview...' : 'PDF source not available';
-		preview.append(status);
+		status.textContent = certificate.pdf ? (isImage ? '' : 'Loading preview...') : 'PDF source not available';
+		if (!isImage) preview.append(status);
 		const content = document.createElement('div');
 		content.className = 'certificate-content';
-		content.innerHTML = `<p class="certificate-label">Certificate ${String(index + 1).padStart(2, '0')}</p><h3>${certificate.title}</h3><div class="certificate-meta"><p><span>Issued by</span><strong>${certificate.organization}</strong></p><p><span>Date earned</span><strong>${certificate.date}</strong></p></div>`;
+		content.innerHTML = `<p class="certificate-label">Certificate ${String(index + 1).padStart(2, '0')}</p><h3>${escapeHtml(certificate.title)}</h3><div class="certificate-meta"><p><span>Issued by</span><strong>${escapeHtml(certificate.organization)}</strong></p><p><span>Date earned</span><strong>${escapeHtml(certificate.date)}</strong></p></div>`;
 		if (certificate.pdf) {
 			content.append(createLink('certificate-button', certificate.pdf, 'View Certificate ↗'));
 		} else {
@@ -87,13 +97,50 @@ const renderCertificates = () => {
 			unavailable.textContent = 'View Certificate ↗';
 			content.append(unavailable);
 		}
+		if (certificate.verificationUrl) content.append(createLink('certificate-button', certificate.verificationUrl, 'Verify Certificate ↗'));
 		card.append(preview, content);
 		grid.append(card);
 	});
 };
 
-renderProjects();
-renderCertificates();
+const loadPortfolioData = async () => {
+	if (!window.supabaseClient) {
+		renderProjects();
+		renderCertificates();
+		return;
+	}
+	try {
+		const [{ data: projects }, { data: certificates }] = await Promise.all([
+			window.supabaseClient.from('projects').select('*').eq('is_published', true).order('sort_order').order('created_at'),
+			window.supabaseClient.from('certificates').select('*').eq('is_published', true).order('sort_order').order('created_at')
+		]);
+		if (projects?.length) {
+			portfolioData.projects = projects.map((project) => ({
+				title: project.title,
+				description: project.description,
+				technologies: project.technologies || [],
+				image: project.image_url || '',
+				liveDemo: project.live_demo_url || '',
+				github: project.github_url || ''
+			}));
+		}
+		if (certificates?.length) {
+			portfolioData.certificates = certificates.map((certificate) => ({
+				title: certificate.title,
+				organization: certificate.organization,
+				date: certificate.date,
+				pdf: certificate.file_url || '',
+				verificationUrl: certificate.verification_url || ''
+			}));
+		}
+	} catch (error) {
+		console.warn('Supabase content unavailable; showing the current portfolio data.', error);
+	}
+	renderProjects();
+	renderCertificates();
+};
+
+loadPortfolioData();
 
 const cvData = {
 	name: 'Youssef Fathy Abdel Hamid',
