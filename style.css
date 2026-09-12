@@ -288,3 +288,159 @@ h3 { font-size: 19px; }
 	.site-header { padding: 11px 13px; }.brand { font-size: 14px; }.hero { padding-top: 72px; }.hero::before { max-width: calc(100% - 24px); opacity: .55; right: 12px; }.hero h1 { font-size: 47px; }.portrait-frame { padding: 7px; }.floating-note { font-size: 8px; padding: 10px 11px; }.note-top { right: -8px; }.note-bottom { left: -8px; }.contact-email { font-size: 15px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+
+/* Refined portfolio palette */
+:root {
+	--bg: #07111f;
+	--surface: #0d1a2a;
+	--surface-soft: #13243a;
+	--text: #edf3f7;
+	--muted: #a3b1c2;
+	--line: rgba(184, 207, 226, .18);
+	--accent: #63d6c4;
+	--accent-dark: #06231f;
+	--accent-warm: #d5b06a;
+	--mono: var(--serif);
+}
+
+body {
+	background: radial-gradient(circle at 78% 5%, rgba(65, 151, 157, .14), transparent 28rem), radial-gradient(circle at 8% 35%, rgba(48, 77, 135, .16), transparent 26rem), var(--bg);
+}
+
+.skills-section, .certificates-section { background: linear-gradient(110deg, rgba(13, 26, 42, .94), rgba(11, 24, 40, .94)); }
+.skill-card, .certificate-card { background: rgba(18, 36, 58, .86); }
+.featured-skill { background: linear-gradient(145deg, rgba(27, 48, 76, .96), rgba(17, 35, 59, .96)); }
+.cv-panel { background: linear-gradient(120deg, #163b4e, #26334e); }
+
+body.light-mode {
+	--bg: #f4f1eb;
+	--surface: #fbfaf7;
+	--surface-soft: #eeeae2;
+	--text: #26313a;
+	--muted: #52616c;
+	--line: rgba(38, 49, 58, .16);
+	--accent: #0b756e;
+	--accent-dark: #f1faf7;
+	--accent-warm: #a87834;
+	background: radial-gradient(circle at 82% 6%, rgba(11, 117, 110, .08), transparent 28rem), radial-gradient(circle at 8% 34%, rgba(168, 120, 52, .07), transparent 25rem), var(--bg);
+}
+
+.light-mode .site-header { background: rgba(251, 250, 247, .88); border-color: var(--line); box-shadow: 0 12px 35px rgba(38, 49, 58, .08); }
+.light-mode .nav-link:hover, .light-mode .nav-link.active { background: rgba(11, 117, 110, .09); color: var(--accent); }
+.light-mode .icon-button:hover { box-shadow: 0 0 17px rgba(11, 117, 110, .16); }
+.light-mode .status-dot { box-shadow: 0 0 0 5px rgba(11, 117, 110, .1), 0 0 13px rgba(11, 117, 110, .35); }
+.light-mode .hero::before { color: rgba(63, 91, 111, .12); }
+.light-mode .hero::after { background: var(--accent); opacity: .06; }
+.light-mode .floating-note { background: rgba(251, 250, 247, .92); box-shadow: 0 15px 40px rgba(38, 49, 58, .12); }
+.light-mode .marquee { background: rgba(238, 234, 226, .68); }
+.light-mode .skills-section, .light-mode .certificates-section { background: linear-gradient(110deg, #eeeae2, #f4f1eb 58%, #e9f0ed); }
+.light-mode .skill-card, .light-mode .certificate-card { background: rgba(251, 250, 247, .96); border-color: rgba(38, 49, 58, .13); box-shadow: 0 20px 45px rgba(38, 49, 58, .08); }
+.light-mode .skill-card:hover, .light-mode .certificate-card:hover { border-color: rgba(11, 117, 110, .34); box-shadow: 0 25px 55px rgba(38, 49, 58, .13), 0 0 24px rgba(11, 117, 110, .06); }
+.light-mode .featured-skill { background: linear-gradient(145deg, #e5f1ed, #f8f6f0); color: var(--text); }
+.light-mode .featured-skill::before { background: var(--accent-warm); box-shadow: 0 0 14px rgba(168, 120, 52, .25); }
+.light-mode .certificate-image { background: linear-gradient(135deg, #e5f1ed, #f2eee6); color: var(--muted); }
+.light-mode .certificate-canvas { box-shadow: 0 8px 20px rgba(38, 49, 58, .12); }
+.light-mode .certificate-button, .light-mode .project-demo { border-color: rgba(11, 117, 110, .34); }
+.light-mode .certificate-button:not(:disabled):hover, .light-mode .project-demo:hover { background: rgba(11, 117, 110, .08); box-shadow: 0 0 18px rgba(11, 117, 110, .12); }
+.light-mode .cv-panel { background: linear-gradient(120deg, #dcece7, #e9e3d6); border-color: rgba(11, 117, 110, .24); box-shadow: 0 25px 60px rgba(38, 49, 58, .12); color: var(--text); }
+.light-mode .cv-panel::after { background: var(--accent); opacity: .1; }
+.light-mode .cv-panel .eyebrow { color: var(--accent); }
+.light-mode .cv-panel p:not(.eyebrow) { color: var(--muted); }
+.light-mode .button-light { background: var(--accent); border-color: var(--accent); color: #f4fffc; box-shadow: 0 10px 24px rgba(11, 117, 110, .18); }
+.light-mode .button-light:hover { box-shadow: 0 14px 30px rgba(11, 117, 110, .24); }
+.light-mode .project-type, .light-mode .certificate-label, .light-mode .skill-index { color: var(--accent); }
+.light-mode .contact-email { text-shadow: none; }
+
+@media (max-width: 850px) {
+	.light-mode .nav { background: rgba(251, 250, 247, .98); border-color: rgba(11, 117, 110, .18); box-shadow: 0 20px 50px rgba(38, 49, 58, .14); }
+}
+
+/* Tech / AI identity */
+:root {
+	--bg: #070d1b;
+	--surface: #0d1628;
+	--surface-soft: #14223a;
+	--text: #edf4ff;
+	--muted: #a5b4c8;
+	--line: rgba(164, 190, 226, .18);
+	--accent: #4c8dff;
+	--accent-dark: #07152f;
+	--accent-cyan: #55d6e8;
+	--accent-violet: #9b83f5;
+}
+
+body {
+	background: radial-gradient(circle at 78% 8%, rgba(76, 141, 255, .14), transparent 28rem), radial-gradient(circle at 12% 36%, rgba(85, 214, 232, .08), transparent 24rem), var(--bg);
+}
+
+.site-header { background: rgba(7, 13, 27, .78); border-color: var(--line); }
+.brand-mark, .button { background: var(--accent); border-color: var(--accent); color: #f7faff; }
+.brand-mark { box-shadow: 0 0 22px rgba(76, 141, 255, .32); }
+.nav-link:hover, .nav-link.active { background: rgba(76, 141, 255, .1); color: var(--accent-cyan); }
+.button { box-shadow: 0 0 24px rgba(76, 141, 255, .18); }
+.button:hover { box-shadow: 0 0 30px rgba(76, 141, 255, .32); }
+.status-dot { background: var(--accent-cyan); box-shadow: 0 0 0 5px rgba(85, 214, 232, .1), 0 0 13px rgba(85, 214, 232, .5); }
+h1 em, h2 em { color: var(--accent-cyan); text-shadow: 0 0 28px rgba(85, 214, 232, .18); }
+.text-link:hover, .hero-meta strong, .project-type, .project-tech span, .certificate-label, .skill-index { color: var(--accent-cyan); }
+.text-link:hover { border-color: var(--accent-cyan); }
+.hero::after { background: linear-gradient(135deg, var(--accent), var(--accent-violet)); }
+.portrait-frame { background: linear-gradient(145deg, rgba(76, 141, 255, .2), rgba(155, 131, 245, .14)); border-color: rgba(76, 141, 255, .34); }
+.orbit { border-color: rgba(85, 214, 232, .32); }
+.orbit-two { border-color: rgba(155, 131, 245, .3); }
+.note-icon, .note-number, .marquee i { color: var(--accent-cyan); }
+.marquee { background: rgba(9, 17, 34, .62); }
+.skills-section, .certificates-section { background: linear-gradient(110deg, rgba(13, 22, 40, .96), rgba(10, 19, 36, .96)); }
+.skill-card, .certificate-card { background: rgba(17, 31, 53, .9); border-color: var(--line); }
+.featured-skill { background: linear-gradient(145deg, rgba(29, 42, 79, .96), rgba(18, 30, 56, .96)); }
+.featured-skill::before { background: var(--accent-violet); box-shadow: 0 0 18px rgba(155, 131, 245, .38); }
+.skill-card:hover, .certificate-card:hover { border-color: rgba(76, 141, 255, .42); box-shadow: 0 25px 65px rgba(0, 0, 0, .32), 0 0 28px rgba(76, 141, 255, .1); }
+.project-art { border-color: var(--line); }
+.project-tech span { border-color: var(--line); }
+.project-demo, .certificate-button { border-color: rgba(76, 141, 255, .36); color: var(--accent-cyan); }
+.project-demo:hover, .certificate-button:not(:disabled):hover { background: rgba(76, 141, 255, .1); box-shadow: 0 0 18px rgba(76, 141, 255, .18); }
+.certificate-image { background: linear-gradient(135deg, rgba(76, 141, 255, .1), rgba(155, 131, 245, .13)), rgba(9, 17, 34, .88); }
+.cv-panel { background: linear-gradient(120deg, #162f52, #29265b); border-color: rgba(76, 141, 255, .32); }
+.cv-panel p:not(.eyebrow) { color: #b5c5da; }
+.button-light { background: var(--accent); border-color: var(--accent); color: #f7faff; }
+.contact-email { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+
+body.light-mode {
+	--bg: #eef2f7;
+	--surface: #f8fafc;
+	--surface-soft: #e7edf5;
+	--text: #202b38;
+	--muted: #536477;
+	--line: rgba(32, 43, 56, .15);
+	--accent: #2e6fe8;
+	--accent-dark: #edf4ff;
+	--accent-cyan: #087f9b;
+	--accent-violet: #6954c7;
+	background: radial-gradient(circle at 82% 6%, rgba(46, 111, 232, .08), transparent 28rem), radial-gradient(circle at 10% 36%, rgba(105, 84, 199, .06), transparent 24rem), var(--bg);
+}
+
+.light-mode .site-header { background: rgba(248, 250, 252, .9); border-color: var(--line); box-shadow: 0 12px 35px rgba(32, 43, 56, .08); }
+.light-mode .brand-mark, .light-mode .button, .light-mode .button-light { background: var(--accent); border-color: var(--accent); color: #f8fbff; box-shadow: 0 10px 24px rgba(46, 111, 232, .18); }
+.light-mode .nav-link:hover, .light-mode .nav-link.active { background: rgba(46, 111, 232, .09); color: var(--accent); }
+.light-mode h1 em, .light-mode h2 em, .light-mode .hero-meta strong { color: var(--accent-cyan); }
+.light-mode .text-link:hover, .light-mode .project-type, .light-mode .project-tech span, .light-mode .certificate-label, .light-mode .skill-index { color: var(--accent); }
+.light-mode .text-link:hover { border-color: var(--accent); }
+.light-mode .hero::after { background: linear-gradient(135deg, var(--accent), var(--accent-violet)); opacity: .07; }
+.light-mode .floating-note { background: rgba(248, 250, 252, .94); box-shadow: 0 15px 40px rgba(32, 43, 56, .1); }
+.light-mode .marquee { background: rgba(231, 237, 245, .72); }
+.light-mode .skills-section, .light-mode .certificates-section { background: linear-gradient(110deg, #e7edf5, #eef2f7 58%, #e8edf7); }
+.light-mode .skill-card, .light-mode .certificate-card { background: rgba(248, 250, 252, .98); border-color: rgba(32, 43, 56, .13); box-shadow: 0 20px 45px rgba(32, 43, 56, .08); }
+.light-mode .skill-card:hover, .light-mode .certificate-card:hover { border-color: rgba(46, 111, 232, .35); box-shadow: 0 25px 55px rgba(32, 43, 56, .13), 0 0 24px rgba(46, 111, 232, .07); }
+.light-mode .featured-skill { background: linear-gradient(145deg, #e4ecfb, #f5f7fc); }
+.light-mode .featured-skill::before { background: var(--accent-violet); box-shadow: 0 0 14px rgba(105, 84, 199, .25); }
+.light-mode .certificate-image { background: linear-gradient(135deg, #e4ecfb, #eeeafb); color: var(--muted); }
+.light-mode .certificate-canvas { box-shadow: 0 8px 20px rgba(32, 43, 56, .12); }
+.light-mode .project-demo, .light-mode .certificate-button { border-color: rgba(46, 111, 232, .34); color: var(--accent); }
+.light-mode .project-demo:hover, .light-mode .certificate-button:not(:disabled):hover { background: rgba(46, 111, 232, .08); box-shadow: 0 0 18px rgba(46, 111, 232, .13); }
+.light-mode .cv-panel { background: linear-gradient(120deg, #dfeafb, #e9e5f8); border-color: rgba(46, 111, 232, .24); box-shadow: 0 25px 60px rgba(32, 43, 56, .12); color: var(--text); }
+.light-mode .cv-panel::after { background: linear-gradient(135deg, var(--accent), var(--accent-violet)); opacity: .1; }
+.light-mode .cv-panel p:not(.eyebrow) { color: var(--muted); }
+.light-mode .contact-email { color: var(--accent); border-color: var(--accent); text-shadow: none; }
+
+@media (max-width: 850px) {
+	.light-mode .nav { background: rgba(248, 250, 252, .98); border-color: rgba(46, 111, 232, .18); box-shadow: 0 20px 50px rgba(32, 43, 56, .14); }
+}
