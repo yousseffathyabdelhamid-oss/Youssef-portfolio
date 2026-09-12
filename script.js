@@ -77,7 +77,7 @@ const renderProjects = () => {
 		const projectInfo = card.querySelector('.project-info');
 		const arrow = createLink('round-arrow', project.liveDemo, '↗', `View ${project.title} live demo`);
 		projectInfo.append(arrow);
-		const demo = createLink('project-demo', project.liveDemo, 'Live Demo ↗');
+		const demo = createLink('project-demo', project.liveDemo, 'View Project ↗');
 		card.append(demo);
 		if (project.github) card.append(createLink('project-demo project-github', project.github, 'GitHub ↗'));
 		grid.append(card);
