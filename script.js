@@ -5,6 +5,7 @@ const menuToggle = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.nav');
 const navLinks = [...document.querySelectorAll('.nav-link')];
 const sections = [...document.querySelectorAll('main section[id]')];
+let observeRevealElements = () => {};
 
 const portfolioData = {
 	projects: [
@@ -82,6 +83,7 @@ const renderProjects = () => {
 		if (project.github) card.append(createLink('project-demo project-github', project.github, 'GitHub ↗'));
 		grid.append(card);
 	});
+	observeRevealElements();
 };
 
 const renderCertificates = async () => {
@@ -338,7 +340,11 @@ const observer = new IntersectionObserver((entries) => {
 	});
 }, { threshold: 0.12 });
 
-document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+observeRevealElements = () => document.querySelectorAll('.reveal:not([data-reveal-observed])').forEach((element) => {
+	element.dataset.revealObserved = 'true';
+	observer.observe(element);
+});
+observeRevealElements();
 
 const sectionObserver = new IntersectionObserver((entries) => {
 	entries.forEach((entry) => {
