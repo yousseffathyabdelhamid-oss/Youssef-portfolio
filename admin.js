@@ -38,12 +38,29 @@ const setMessage = (element, message, error = false) => {
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
 const safeUrl = (value = '') => /^(https?:\/\/|\.\/|\.\.\/|\/)/i.test(String(value)) ? String(value) : '';
 
-const renderFilePreview = (previewId, url = '', label = 'Current file') => {
+const imageMimeTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif', 'image/avif']);
+
+const getRemoteFileType = async (url, declaredType = '') => {
+	const normalizedType = String(declaredType).split(';')[0].trim().toLowerCase();
+	if (imageMimeTypes.has(normalizedType)) return 'image';
+	if (normalizedType === 'application/pdf') return 'pdf';
+	try {
+		const response = await fetch(url, { cache: 'no-store' });
+		const contentType = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
+		if (imageMimeTypes.has(contentType)) return 'image';
+		if (contentType === 'application/pdf') return 'pdf';
+	} catch (error) {
+		console.warn(`Could not determine file type for ${url}`, error);
+	}
+	return 'unknown';
+};
+
+const renderFilePreview = async (previewId, url = '', label = 'Current file') => {
 	const preview = $(previewId);
 	preview.replaceChildren();
 	preview.hidden = !url;
 	if (!url) return;
-	if (/\.(avif|gif|jpe?g|png|webp)(\?.*)?$/i.test(url)) {
+	if (await getRemoteFileType(url) === 'image') {
 		const image = document.createElement('img');
 		image.src = url;
 		image.alt = label;
@@ -106,6 +123,7 @@ const getFileUrl = (bucket, path) => supabase.storage.from(bucket).getPublicUrl(
 
 const uploadFile = async (bucket, file) => {
 	if (!file) return null;
+	if (!file.type || (!file.type.startsWith('image/') && file.type !== 'application/pdf')) throw new Error('Choose a valid JPG, JPEG, PNG, WEBP, SVG, or PDF file.');
 	const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
 	const path = `${crypto.randomUUID()}-${safeName}`;
 	const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: false, contentType: file.type || undefined });

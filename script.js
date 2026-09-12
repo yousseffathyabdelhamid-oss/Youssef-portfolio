@@ -18,12 +18,12 @@ const portfolioData = {
 		}
 	],
 	certificates: [
-		{ title: 'Artificial Intelligence Fundamentals', organization: 'IBM', date: '29 Mar 2026', pdf: './certificates/ibm-ai.pdf' },
-		{ title: 'Hardware and Upgrade Support', organization: 'Cisco Networking Academy', date: '25 Mar 2026', pdf: './certificates/cisco-hardware.pdf' },
-		{ title: 'التصميم بالذكاء الاصطناعي', organization: 'For9a', date: '8 Sep 2026', pdf: './certificates/for9a-ai.pdf' },
-		{ title: 'Certificate of Completion', organization: 'HP LIFE', date: '9 Aug 2026', pdf: './certificates/hp-life.pdf' },
-		{ title: 'International Computer Driving Licence - ICDL Base', organization: 'Edraak', date: '7 Sep 2026', pdf: './certificates/edraak-icdl.pdf' },
-		{ title: '1 Million Prompters', organization: 'Dubai Centre for Artificial Intelligence', date: '', pdf: './image/youssef-fathy-abdel-hamid-certificate.pdf' }
+		{ title: 'Artificial Intelligence Fundamentals', organization: 'IBM', date: '29 Mar 2026', pdf: './certificates/ibm-ai.pdf', fileType: 'application/pdf' },
+		{ title: 'Hardware and Upgrade Support', organization: 'Cisco Networking Academy', date: '25 Mar 2026', pdf: './certificates/cisco-hardware.pdf', fileType: 'application/pdf' },
+		{ title: 'التصميم بالذكاء الاصطناعي', organization: 'For9a', date: '8 Sep 2026', pdf: './certificates/for9a-ai.pdf', fileType: 'application/pdf' },
+		{ title: 'Certificate of Completion', organization: 'HP LIFE', date: '9 Aug 2026', pdf: './certificates/hp-life.pdf', fileType: 'application/pdf' },
+		{ title: 'International Computer Driving Licence - ICDL Base', organization: 'Edraak', date: '7 Sep 2026', pdf: './certificates/edraak-icdl.pdf', fileType: 'application/pdf' },
+		{ title: '1 Million Prompters', organization: 'Dubai Centre for Artificial Intelligence', date: '', pdf: './image/youssef-fathy-abdel-hamid-certificate.pdf', fileType: 'application/pdf' }
 	]
 };
 
@@ -31,12 +31,21 @@ window.portfolioData = portfolioData;
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
 const safeUrl = (value = '') => /^(https?:\/\/|\.\/|\.\.\/|\/)/i.test(String(value)) ? String(value) : '';
-const isImageUrl = (value = '') => {
+const imageMimeTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif', 'image/avif']);
+
+const getFileType = async (url, declaredType = '') => {
+	const normalizedType = String(declaredType).split(';')[0].trim().toLowerCase();
+	if (imageMimeTypes.has(normalizedType)) return 'image';
+	if (normalizedType === 'application/pdf') return 'pdf';
 	try {
-		return /\.(avif|gif|jpe?g|png|webp)$/i.test(new URL(value, window.location.href).pathname);
+		const response = await fetch(url, { cache: 'no-store' });
+		const contentType = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
+		if (imageMimeTypes.has(contentType)) return 'image';
+		if (contentType === 'application/pdf') return 'pdf';
 	} catch (error) {
-		return false;
+		console.warn(`Could not determine file type for ${url}`, error);
 	}
+	return 'unknown';
 };
 
 const createLink = (className, href, label, ariaLabel) => {
@@ -56,7 +65,15 @@ const renderProjects = () => {
 		const card = document.createElement('article');
 		card.className = `project-card${index === 0 ? ' project-large' : ''} reveal`;
 		const imageUrl = safeUrl(project.image);
-		card.innerHTML = `<div class="project-art project-image-wrap"><img class="project-image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(project.title)} project preview"><span class="image-overlay" aria-hidden="true"></span></div><div class="project-info"><div><p class="project-type">${String(index + 1).padStart(2, '0')} / Educational web project</p><h3>${escapeHtml(project.title)}</h3><p class="project-description">${escapeHtml(project.description)}</p><div class="project-tech">${project.technologies.map((technology) => `<span>${escapeHtml(technology)}</span>`).join('')}</div></div></div>`;
+		const projectImage = imageUrl ? `<img class="project-image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(project.title)} project preview">` : '<span class="project-image-placeholder" aria-hidden="true">Project preview unavailable</span>';
+		card.innerHTML = `<div class="project-art project-image-wrap${imageUrl ? ' has-image' : ''}">${projectImage}<span class="image-overlay" aria-hidden="true"></span></div><div class="project-info"><div><p class="project-type">${String(index + 1).padStart(2, '0')} / Educational web project</p><h3>${escapeHtml(project.title)}</h3><p class="project-description">${escapeHtml(project.description)}</p><div class="project-tech">${project.technologies.map((technology) => `<span>${escapeHtml(technology)}</span>`).join('')}</div></div></div>`;
+		const projectImageElement = card.querySelector('.project-image');
+		projectImageElement?.addEventListener('error', () => {
+			const frame = projectImageElement.parentElement;
+			projectImageElement.remove();
+			frame.classList.remove('has-image');
+			frame.insertAdjacentHTML('afterbegin', '<span class="project-image-placeholder" aria-hidden="true">Project preview unavailable</span>');
+		});
 		const projectInfo = card.querySelector('.project-info');
 		const arrow = createLink('round-arrow', project.liveDemo, '↗', `View ${project.title} live demo`);
 		projectInfo.append(arrow);
@@ -67,14 +84,16 @@ const renderProjects = () => {
 	});
 };
 
-const renderCertificates = () => {
+const renderCertificates = async () => {
 	const grid = document.querySelector('#certificate-grid');
-	portfolioData.certificates.forEach((certificate, index) => {
+	grid.replaceChildren();
+	for (const [index, certificate] of portfolioData.certificates.entries()) {
 		const card = document.createElement('article');
 		card.className = 'certificate-card';
 		const preview = document.createElement('div');
-		const isImage = isImageUrl(certificate.pdf);
-		preview.className = `certificate-image${certificate.pdf && !isImage ? ' pdf-preview' : ''}${certificate.pdf ? '' : ' pdf-missing'}`;
+		const fileType = certificate.pdf ? await getFileType(certificate.pdf, certificate.fileType) : 'unknown';
+		const isImage = fileType === 'image';
+		preview.className = `certificate-image${certificate.pdf && fileType === 'pdf' ? ' pdf-preview' : ''}${certificate.pdf ? '' : ' pdf-missing'}`;
 		if (isImage) {
 			preview.classList.add('has-image');
 			const image = document.createElement('img');
@@ -82,7 +101,7 @@ const renderCertificates = () => {
 			image.alt = `${escapeHtml(certificate.title)} certificate preview`;
 			image.decoding = 'async';
 			preview.append(image);
-		} else if (certificate.pdf) {
+		} else if (certificate.pdf && fileType === 'pdf') {
 			const canvas = document.createElement('canvas');
 			canvas.className = 'certificate-canvas';
 			canvas.dataset.pdf = certificate.pdf;
@@ -91,7 +110,7 @@ const renderCertificates = () => {
 		}
 		const status = document.createElement('span');
 		status.className = 'preview-status';
-		status.textContent = certificate.pdf ? (isImage ? '' : 'Loading preview...') : 'PDF source not available';
+		status.textContent = certificate.pdf ? (isImage ? '' : fileType === 'pdf' ? 'Loading preview...' : 'Preview unavailable') : 'PDF source not available';
 		if (!isImage) preview.append(status);
 		const content = document.createElement('div');
 		content.className = 'certificate-content';
@@ -109,13 +128,14 @@ const renderCertificates = () => {
 		if (certificate.verificationUrl) content.append(createLink('certificate-button', certificate.verificationUrl, 'Verify Certificate ↗'));
 		card.append(preview, content);
 		grid.append(card);
-	});
+	}
 };
 
 const loadPortfolioData = async () => {
 	if (!window.supabaseClient) {
 		renderProjects();
-		renderCertificates();
+		await renderCertificates();
+		if (window.pdfjsLib) renderCertificatePreviews();
 		return;
 	}
 	try {
@@ -139,6 +159,7 @@ const loadPortfolioData = async () => {
 				organization: certificate.organization,
 				date: certificate.date,
 				pdf: certificate.file_url || '',
+				fileType: certificate.mime_type || certificate.file_type || '',
 				verificationUrl: certificate.verification_url || ''
 			}));
 		}
@@ -146,7 +167,8 @@ const loadPortfolioData = async () => {
 		console.warn('Supabase content unavailable; showing the current portfolio data.', error);
 	}
 	renderProjects();
-	renderCertificates();
+	await renderCertificates();
+	if (window.pdfjsLib) renderCertificatePreviews();
 };
 
 loadPortfolioData();
@@ -237,18 +259,24 @@ const downloadCv = () => {
 
 document.querySelector('.download-cv')?.addEventListener('click', downloadCv);
 
-const renderCertificatePreviews = async () => {
+let renderingCertificatePreviews = false;
+
+async function renderCertificatePreviews() {
+	if (renderingCertificatePreviews) return;
+	renderingCertificatePreviews = true;
 	if (!window.pdfjsLib) {
-		document.querySelectorAll('.pdf-preview').forEach((frame) => {
-			frame.classList.add('pdf-error');
-			frame.querySelector('.preview-status').textContent = 'PDF preview unavailable';
-		});
+		renderingCertificatePreviews = false;
 		return;
 	}
 	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-	const canvases = [...document.querySelectorAll('.certificate-canvas')];
+	const canvases = [...document.querySelectorAll('.certificate-canvas')].filter((canvas) => !canvas.closest('.certificate-image')?.classList.contains('pdf-ready') && !canvas.dataset.rendering);
+	if (!canvases.length) {
+		renderingCertificatePreviews = false;
+		return;
+	}
 	await Promise.all(canvases.map(async (canvas) => {
 		const frame = canvas.closest('.certificate-image');
+		canvas.dataset.rendering = 'true';
 		try {
 			const pdf = await pdfjsLib.getDocument(canvas.dataset.pdf).promise;
 			const page = await pdf.getPage(1);
@@ -263,16 +291,18 @@ const renderCertificatePreviews = async () => {
 			canvas.style.width = `${viewport.width}px`;
 			canvas.style.height = `${viewport.height}px`;
 			await page.render({ canvasContext: canvas.getContext('2d'), viewport, transform: deviceScale !== 1 ? [deviceScale, 0, 0, deviceScale, 0, 0] : null }).promise;
+			frame.classList.remove('pdf-error');
 			frame.classList.add('pdf-ready');
 		} catch (error) {
 			frame.classList.add('pdf-error');
 			frame.querySelector('.preview-status').textContent = 'Preview unavailable';
 			console.error(`Could not render ${canvas.dataset.pdf}`, error);
+		} finally {
+			delete canvas.dataset.rendering;
 		}
 	}));
-};
-
-window.addEventListener('load', renderCertificatePreviews);
+	renderingCertificatePreviews = false;
+}
 
 const storedTheme = localStorage.getItem('portfolio-theme');
 if (storedTheme === 'light') {

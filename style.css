@@ -222,8 +222,10 @@ h3 { font-size: 19px; }
 .project-card:hover .project-art { box-shadow: 0 27px 65px rgba(0, 0, 0, .38), 0 0 28px rgba(72, 229, 255, .1); transform: translateY(-5px); }
 .project-image-wrap { isolation: isolate; }
 .project-image { border-radius: 13px; display: block; height: 100%; object-fit: cover; object-position: center; position: absolute; width: 100%; }
+.project-image-placeholder { color: var(--muted); font: 10px var(--mono); letter-spacing: .05em; text-transform: uppercase; }
 .image-overlay { background: linear-gradient(145deg, rgba(5, 9, 20, .04), rgba(5, 9, 20, .2)); inset: 0; pointer-events: none; position: absolute; z-index: 1; }
-.project-card:hover .project-image { filter: saturate(1.08); transform: scale(1.025); transition: filter .3s ease, transform .3s ease; }
+.project-image-wrap.has-image .image-overlay { display: none; }
+.project-card:hover .project-image { transform: scale(1.025); transition: transform .3s ease; }
 .art-aurora { background: radial-gradient(circle at 60% 45%, rgba(72, 229, 255, .42), transparent 25%), linear-gradient(135deg, #101e38, #11142e 55%, #211448); }
 .art-cobalt { background: radial-gradient(circle at 50% 30%, rgba(169, 139, 255, .48), transparent 30%), #101a35; }
 .art-sand { background: radial-gradient(circle at 50% 50%, rgba(72, 229, 255, .36), transparent 23%), #0c2133; }
