@@ -116,6 +116,11 @@ const showDashboard = async () => {
 	authPanel.hidden = true;
 	dashboard.hidden = false;
 	setMessage(loginMessage, '');
+	if (window.location.hash === '#projects') {
+		resetForm('project-form');
+		$('project-form').hidden = false;
+		$('project-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+	}
 	return session;
 };
 
